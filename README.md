@@ -1,5 +1,5 @@
 # サーバーアプリ  
-GroupAndSeatServerLogic.csとGroupAndSeatServerGroupClass.csを適切なc#コンパイラでコンパイルし実行してください　　
+GroupAndSeatServerLogic.csとGroupAndSeatServerGroupClass.csを適切なc#コンパイラでコンパイルし実行してください　　  
 # クライアントアプリ  
 Apkファイルをandroidにインストールすることで使用可能になります。また、unityで自力でビルドすることも可能です。  
 ## 使い方  
@@ -10,7 +10,7 @@ IP ADDRESSとSTARTにサーバーのホストネームとポート番号を入�
 GETボタンを押すとサーバーからグループ情報を取得しテキストで表示します。  
 その他のボタンで対応した画面に移動します  
 ### SET画面  
-数字ボタンで席を複数指定しSENDボタンで命令を送信します  
+数字ボタンで客を入れたい席を複数指定しSENDボタンで命令を送信します  
 ### REMOVE画面  
 数字ボタンを押すと対応した席を開放する命令を送信します  
 ### SUPERSEATVISUALIZER画面  
