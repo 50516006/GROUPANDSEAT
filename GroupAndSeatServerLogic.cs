@@ -60,29 +60,29 @@ namespace GroupAndSeat
                 //クエリ解釈して実行
                 try
                 {
-                    string[] strs = nsr.ReadLine().Split(' ');
+                    string[] splitedQuery = nsr.ReadLine().Split(' ');
                     string ans;
                     //入店
-                    if (strs[0] == "OPEN"　| strs[0]=="SET")
-                        ans = Open(strs);
+                    if (splitedQuery[0] == "OPEN"　| splitedQuery[0]=="SET")
+                        ans = Open(splitedQuery);
                     //退店時処理
-                    else if (strs[0] == "CLOSE" | strs[0] == "REMOVE")
-                        ans = strs.Length != 2 ? "ERR INVALIED_COMMANDLENGTH" : Gremove_From_Seat(int.Parse(strs[1]));
+                    else if (splitedQuery[0] == "CLOSE" | splitedQuery[0] == "REMOVE")
+                        ans = splitedQuery.Length != 2 ? "ERR INVALIED_COMMANDLENGTH" : Gremove_From_Seat(int.Parse(splitedQuery[1]));
                     //グループ情報取得
-                    else if (strs[0] == "GET")
+                    else if (splitedQuery[0] == "GET")
                         ans = Get();
                     //席の使用情報
-                    else if (strs[0] == "SC")
+                    else if (splitedQuery[0] == "SC")
                         ans = Seat_Chec();
                     //席の使用情報識別付き
-                    else if (strs[0] == "SSC")
+                    else if (splitedQuery[0] == "SSC")
                         ans = SuperSeatCheck();
                     //グループの時間書き換え
-                    else if (strs[0] == "TC")
-                        ans = TimeChange(strs[1],strs[2]);
+                    else if (splitedQuery[0] == "TC")
+                        ans = TimeChange(splitedQuery[1],splitedQuery[2]);
                     //席移動
-                    else if (strs[0] == "CHS")
-                        ans = SeatChange(int.Parse(strs[1]), strs[2].Split(','));
+                    else if (splitedQuery[0] == "CHS")
+                        ans = SeatChange(int.Parse(splitedQuery[1]), splitedQuery[2].Split(','));
                     //未実装コマンド
                     else
                         ans = "ERRO THERE_IS_NOT_SUCH_A_COMMAND";
@@ -103,11 +103,11 @@ namespace GroupAndSeat
         /// <param name="iden">席番の文字列型</param>
         /// <param name="time">現在時刻から何分前を開始時刻とするか</param>
         /// <returns>結果を示す文字列</returns>
-        public static string TimeChange(string iden, string time) {
+        public static string TimeChange(string groupIdentifireSeat, string minusMinutes_string) {
             
             int index;
             try {
-                index = int.Parse(iden);
+                index = int.Parse(groupIdentifireSeat);
                 if (seats[index] == null) {
                     return "SEAT_MUST_BE_USED";
                 } 
@@ -118,10 +118,10 @@ namespace GroupAndSeat
             }
             try
             {
-                int timen = int.Parse(time);
+                int timen = int.Parse(minusMinutes_string);
                 System.DateTime now = System.DateTime.Now;
                 seats[index].start = now.AddMinutes(-timen);
-                return string.Format("OK_CHANGING_START_TIME_FOR_SEAT{0}_IS_ACCEPTED",iden);
+                return string.Format("OK_CHANGING_START_TIME_FOR_SEAT{0}_IS_ACCEPTED",groupIdentifireSeat);
             }
             catch {
                 return "TIME_MUST_BE_INT";
@@ -138,28 +138,28 @@ namespace GroupAndSeat
         /// <param name="iden">グループが使用している席のうち一つ</param>
         /// <param name="nss">グループが新たに使用する席の文字列</param>
         /// <returns>成否を示す文字列</returns>
-        public static string SeatChange(int iden, string[] nss)
+        public static string SeatChange(int groupIdentifireSeat, string[] newSeatsNombersString)
         {
-            List<int> ns;
+            List<int> newSeatNombers;
             try
             {
-                ns = nss.Select(x => int.Parse(x)).ToList();
+                newSeatNombers = newSeatsNombersString.Select(x => int.Parse(x)).ToList();
             }
             catch {
                     return "Seat must be nomber";
             }
 
 
-            if (seats[iden] == null)
+            if (seats[groupIdentifireSeat] == null)
                 return "Blank Group";
-            Group g = seats[iden];
-            if (ns.Any(x => seats[x] != null && seats[x] != g))
+            Group g = seats[groupIdentifireSeat];
+            if (newSeatNombers.Any(x => seats[x] != null && seats[x] != g))
             {
                 return "Other Group's Seat Cannot Be Selected";
             }
             g.seatnombers.ForEach(x => seats[x] = null);
-            g.seatnombers = ns;
-            ns.ForEach(x => seats[x] = g);
+            g.seatnombers = newSeatNombers;
+            newSeatNombers.ForEach(x => seats[x] = g);
             return "Ok Changed";
         }
         /// <summary>
@@ -190,13 +190,13 @@ namespace GroupAndSeat
         /// </summary>
         /// <param name="l">使用予定席番</param>
         /// <returns>成否を示す文字列</returns>        
-        public static string Gadd(List<int> l)
+        public static string Gadd(List<int> willUsedSeat)
         {
-            if(l.Any(x=>seats[x]!=null))
+            if(willUsedSeat.Any(x=>seats[x]!=null))
                 return "ERR USED_SEAT_EXISTS";
             try
             {
-                groups.Add(new Group(l, ref seats));
+                groups.Add(new Group(willUsedSeat, ref seats));
                 return "OK ONE_GROUP_HAS_BEEN_RESISTERED";
             }
             catch
@@ -210,12 +210,12 @@ namespace GroupAndSeat
         /// <returns>席使用情報</returns>        
         public static string SuperSeatCheck()
         {
-            int[] ss=Enumerable.Repeat(999, seats.Length).ToArray();
+            int[] seatsStatus=Enumerable.Repeat(999, seats.Length).ToArray();
             for (int i = 0; i < groups.Count; i++)
             {
-                groups[i].seatnombers.ForEach(x => ss[x] = i);
+                groups[i].seatnombers.ForEach(x => seatsStatus[x] = i);
             }
-            string ans = "OK " + string.Join(" ", ss);
+            string ans = "OK " + string.Join(" ", seatsStatus);
 
             return ans;
         }
@@ -250,10 +250,7 @@ namespace GroupAndSeat
         /// <returns>席使用情報を示す文字列</returns>
         public static string Seat_Chec()
         {
-            string ans = "OK";
-            foreach (Group g in seats)
-                ans += g == null ? " E" : " U";
-            return ans;
+            return "OK " + string.Join(" ", seats.Select(x => x == null ? "E" : "U").ToArray());
         }
         /// <summary>
         /// 全グループの情報取得
@@ -262,8 +259,7 @@ namespace GroupAndSeat
         public static string Get()
         {
             string ans = "OK " + groups.Count + " Groups Exists\r\n";
-            ans+=string.Join("\r\n", groups.Select(x => x.Print_Stat()).ToList());
-            return ans;
+            return ans+string.Join("\r\n", groups.Select(x => x.Print_Stat()).ToList());
         }
     }
 }
