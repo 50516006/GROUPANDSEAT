@@ -1,0 +1,6 @@
+C:\Users\windr\workspace\GROUPANDSEAT\bin\Debug\ConsoleApplication.exe
+C:\Users\windr\workspace\GROUPANDSEAT\bin\Debug\ConsoleApplication.pdb
+C:\Users\windr\workspace\GROUPANDSEAT\obj\x86\Debug\GroupAndSeatServer.csprojAssemblyReference.cache
+C:\Users\windr\workspace\GROUPANDSEAT\obj\x86\Debug\GroupAndSeatServer.csproj.CoreCompileInputs.cache
+C:\Users\windr\workspace\GROUPANDSEAT\obj\x86\Debug\ConsoleApplication.exe
+C:\Users\windr\workspace\GROUPANDSEAT\obj\x86\Debug\ConsoleApplication.pdb
