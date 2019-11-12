@@ -15,13 +15,14 @@ namespace GroupAndSeat
         /// <summary>
         /// エントリーポイント
         /// </summary>
-        /// <param name="args">引数 席の総数を示す10進数整数</param>
+        /// <param name="args">引数 席の総数を示す10進数整数 ポート番号</param>
         static int Main(string[] args)
         {
+            string argErro = "引数は席数とポート番号の二つです";
             //引数確認
-            if (args.Length != 1)
+            if (args.Length != 2)
             {
-                Console.WriteLine("引数の数がおかしいです");
+                Console.WriteLine(argErro);
                 return 1;
             }
             //グループ保存領域の初期化
@@ -35,8 +36,24 @@ namespace GroupAndSeat
                 Console.WriteLine("席数は非負整数値です");
                 return 1;
             }
+            int listeningPortNomber;
+            try
+            {
+                listeningPortNomber = int.Parse(args[1]);
+                if (listeningPortNomber > 65535 | listeningPortNomber <1024 )
+                {
+                    Console.WriteLine("自由に使用可能なポート番号にしてください");
+                    return 1;
+                }
+            }
+            catch
+            {
+                Console.WriteLine(argErro);
+                return 1;
+            }
             //待ち受け準備と開始
-            var listener = new System.Net.Sockets.TcpListener(System.Net.IPAddress.Any, 9080);
+            
+            var listener = new System.Net.Sockets.TcpListener(System.Net.IPAddress.Any, listeningPortNomber);
             //外部でのプロセス監視用
             try
             {
@@ -46,10 +63,10 @@ namespace GroupAndSeat
             }
             catch { }
 
+            listener.Start();
             //クエリ受信開始
             do
             {
-                listener.Start();
                 System.Net.Sockets.TcpClient client = listener.AcceptTcpClient();
                 var ns = client.GetStream();
                 var nsr = new System.IO.StreamReader(ns, System.Text.Encoding.UTF8);
@@ -100,8 +117,8 @@ namespace GroupAndSeat
         /// <summary>
         /// 開始時間変更
         /// </summary>
-        /// <param name="iden">席番の文字列型</param>
-        /// <param name="time">現在時刻から何分前を開始時刻とするか</param>
+        /// <param name="index">席番の文字列型</param>
+        /// <param name="minusMinutes_string">現在時刻から何分前を開始時刻とするか</param>
         /// <returns>結果を示す文字列</returns>
         public static string TimeChange(string groupIdentifireSeat, string minusMinutes_string) {
             
@@ -135,8 +152,8 @@ namespace GroupAndSeat
         /// <summary>
         /// グループの使用する席を変更する
         /// </summary>
-        /// <param name="iden">グループが使用している席のうち一つ</param>
-        /// <param name="nss">グループが新たに使用する席の文字列</param>
+        /// <param name="groupIdentifireSeat">グループが使用している席のうち一つ</param>
+        /// <param name="newSeatsNombersString">グループが新たに使用する席の文字列</param>
         /// <returns>成否を示す文字列</returns>
         public static string SeatChange(int groupIdentifireSeat, string[] newSeatsNombersString)
         {
@@ -165,18 +182,18 @@ namespace GroupAndSeat
         /// <summary>
         /// 入店
         /// </summary>
-        /// <param name="strs">配列へと変換された文字列</param>
+        /// <param name="splitedQuery">配列へと変換されたクエリ文字列</param>
         /// <returns>成否を示す文字列</returns>
-        public static string Open(string[] strs )
+        public static string Open(string[] splitedQuery )
         {
             //引数なしのコマンドにエラーを返す
-            if (strs.Length < 2)
+            if (splitedQuery.Length < 2)
                 return "ERR INVALIED_COMMAND_LENGTH";
             List<int> sn ;
             //使用席のリストを作成
             try
             {
-                sn=strs.Skip(1).Select(x=>int.Parse(x)).ToList();
+                sn=splitedQuery.Skip(1).Select(x=>int.Parse(x)).ToList();
             }
             catch
             {
@@ -188,7 +205,7 @@ namespace GroupAndSeat
         /// <summary>
         /// 席を作成
         /// </summary>
-        /// <param name="l">使用予定席番</param>
+        /// <param name="willUsedSeat">使用予定席番</param>
         /// <returns>成否を示す文字列</returns>        
         public static string Gadd(List<int> willUsedSeat)
         {
