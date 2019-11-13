@@ -57,7 +57,7 @@ namespace GroupAndSeat
             //外部でのプロセス監視用
             try
             {
-                System.IO.StreamWriter sw = new System.IO.StreamWriter("/usr/local/bin/pidgass.txt", false);
+                System.IO.StreamWriter sw = new System.IO.StreamWriter("pidgass.txt", false);
                 sw.WriteLine(System.Diagnostics.Process.GetCurrentProcess().Id);
                 sw.Close();
             }
